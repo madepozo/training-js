@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="posts">
+        </div>
+        <form class="form form-create">
+          <h2>Create Post</h2>
+          <div class="form-control">
+            <label for="">ID</label>
+            <input type="text" name="id" />
+          </div>
+          <div class="form-control">
+            <label for="">Title</label>
+            <input type="text" name="title" />
+          </div>
+          <div class="form-control">
+            <label for="">Description</label>
+            <input type="text" name="description" />
+          </div>
+          <div class="form-control">
+            <button class="btmSave" type="submit">Create</button>
+          </div>
+        </form>
+    </div>
+    <script type="text/template" class="tplPosts">
+        {% posts.forEach(function(post) { %}
+            <div class="post" data-id="{{ post._id }}">
+                {{ _.template(template)(post) }}
+            </div>
+        {% }); %}
+    </script>
+    <script type="text/template" class="tplPost">
+        <h4 class="post-title" data-id="{{ _id }}">{{ title }}</h4>
+        <img class="post-image" src="/images/logo.png" alt="{{ title }}" />
+        <p class="post-description">{{ description }}</p>
+        <a class="btn-delete" data-id="{{ _id }}">Delete</a>
+    </script>
+    <script src="/js/underscore.js"></script>
+    <script src="/js/helpers.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

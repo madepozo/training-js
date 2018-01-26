@@ -1,0 +1,140 @@
+body {
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  font-family: Helvetica, Arial, sans-serif;
+}
+.posts {
+    box-sizing: border-box;
+    width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100px;
+    text-align: center;
+  }
+
+span.item {
+  border-radius: 4px;
+  display: inline-block;
+  margin: 8px;
+  padding: 6px 12px;
+  min-width: 80px;
+  border: 1px solid #F38;
+  background: #F50;
+  text-align: center;
+  color: #FFF;
+  font-size: 18px;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.posts {
+  box-sizing: border-box;
+  width: 60%;
+  margin: 0 auto;
+  padding: 0 10px 30px 10px;
+}
+
+.form {
+  box-sizing: border-box;
+  border-radius: 10px;
+  width: 35%;
+  padding: 10px;
+  margin-top: 20px;
+  margin-left: 50px;
+}
+
+.form h2 {
+  text-align: center;
+  color: #727272;
+}
+
+.form-control {
+  margin: 20px 0;
+  padding: 10px;
+}
+
+.form-control label {
+  font-size: 18px;
+  color: #444;
+  display: inline-block;
+  width: 100px;
+}
+
+.form-control input,
+.form-control textarea {
+  display: inline-block;
+  width: 70%;
+  height: 32px;
+  font-size: 20px;
+  font-family: Helvetica;
+  color: #727272;
+  padding-left: 10px;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 8px 16px;
+  font-size: 22px;
+  display: inline-block;
+  border: none;
+
+}
+
+.posts, .form {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.post {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border-bottom: 1px solid;
+  position: relative;
+}
+.post:last-child {
+  border: none;
+}
+
+.post-title {
+  font-size: 1.4em;
+  color: #666;
+  padding-bottom: 0.5em;
+  margin: 8px;
+}
+
+.post-image {
+  display: inline-block;
+  width: 120px;
+  height: auto;
+}
+
+.post-description {
+  display: inline-block;
+  margin: 0 0 0 10px;
+  padding: 0;
+  font-size: 15px;
+  text-align: justify;
+  width: calc(100% - 140px);
+  vertical-align: top;
+}
+
+.btn-delete {
+  display: inline-block;
+  color: white;
+  background: red;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  position: absolute;
+  right: 5px;
+  bottom: 10px;
+  margin-top: -30px;
+}
