@@ -34,6 +34,9 @@ exports.read_a_post = function (req, res) {
 };
 
 exports.update_a_post = function (req, res) {
+    var body = req.body;
+
+    body.updated_date = new Date();
     Post.findOneAndUpdate({ _id: req.params.postId }, req.body, { new: true }, function (err, data) {
         if (err) {
             res.send(err);

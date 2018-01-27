@@ -71,10 +71,38 @@ body {
   display: inline-block;
   width: 70%;
   height: 32px;
-  font-size: 20px;
+  font-size: 16px;
   font-family: Helvetica;
   color: #727272;
   padding-left: 10px;
+  border: 1px solid #CCC;
+}
+
+.form .btmSave {
+  background: #009fc6;
+  border: 1px solid #009fc6;
+  color: #FFF;
+  font-size: 16px;
+}
+
+.form.form-create .form-title-update {
+  display: none;
+}
+
+.form.form-update .form-title-create {
+  display: none;
+}
+
+.form.form-create .btnSave-update {
+  display: none;
+}
+
+.form.form-update .btnSave-create {
+  display: none;
+}
+
+.form-control textarea {
+  height: 130px;
 }
 
 button {
@@ -126,10 +154,12 @@ button {
   vertical-align: top;
 }
 
-.btn-delete {
+.btn-delete,
+.btn-update {
   display: inline-block;
   color: white;
   background: red;
+  font-size: 14px;
   padding: 6px 12px;
   cursor: pointer;
   border-radius: 4px;
@@ -137,4 +167,15 @@ button {
   right: 5px;
   bottom: 10px;
   margin-top: -30px;
+}
+
+.btn-update {
+  background: green;
+  right: 90px;
+}
+
+.btn-update.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }

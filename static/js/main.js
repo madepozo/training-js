@@ -19,87 +19,87 @@
     Events = {
         handleSubmit: function (event) {
             event.preventDefault();
-            var post, $form, $post;
+            var $form, $post, classOperation, _post;
 
             $form = event.target;
-            post = {
+            _post = {
                 title: $form.title.value,
                 description: $form.description.value
             };
 
-            savePost(post, function (data) {
-                $form.reset();
-                $post = document.createElement('div');
-                $post.className = 'post';
-                $post.setAttribute('data-id', data._id);
-                $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
-                dom.container.appendChild($post);
-            });
+            if ($form.classList.contains('form-create')) {
+                post.save(data, function (data) {
+                    $form.reset();
+                    $post = document.createElement('div');
+                    $post.className = 'post';
+                    $post.setAttribute('data-id', data._id);
+                    $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
+                    dom.container.appendChild($post);
+                });
+            } else {
+                post.update($form._id.value, _post, function (data) {
+                    var $post;
+
+                    $post = qs('.post[data-id="' + data._id + '"]');
+                    $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
+                    $form.classList.remove('form-update');
+                    $form.classList.add('form-create');
+                    $form.reset();
+                });
+            }
         },
         handleDelete: function (event) {
             var $el, _id;
 
             $el = event.target;
             _id = $el.getAttribute('data-id');
-            removePost(_id, function (data) {
+            post.remove(_id, function (data) {
                 var $postToDelete;
 
-                $postToDelete = document.querySelector('[data-id="' + _id + '"]');
+                $postToDelete = qs('.post[data-id="' + _id + '"]');
                 $postToDelete.remove();
+            });
+        },
+        handleUpdate: function (event) {
+            var $el, postId;
+
+            $el = event.target;
+            postId = $el.getAttribute('data-id');
+            $el.classList.add('disabled');
+            post.get(postId, function (data) {
+                dom.form.classList.remove('form-create');
+                dom.form.classList.add('form-update');
+                setFormToUpdate(data);
             });
         }
     };
 
-    function removePost(_id, cb) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('DELETE', '/posts/' + _id);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === 200) {
-                cb(JSON.parse(xhr.responseText));
+    function setFormToUpdate(data) {
+        Object.keys(data).forEach(function (key) {
+            if (dom.form[key]) {
+                dom.form[key].value = data[key];
             }
-        };
-
-        xhr.send();
-    }
-
-    function savePost(post, cb) {
-        var xhr, params;
-        
-        xhr = new XMLHttpRequest();
-        xhr.open('POST', '/posts');
-        params = Object.keys(post).map(function (key) {
-            return key + '=' + encodeURIComponent(post[key]);
-        }).join('&');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === 200) {
-                cb(JSON.parse(xhr.responseText));
-            }
-        };
-        xhr.send(params);
+        });
     }
 
     function ready() {
         dom = {};
         catchDOM();
-        getPosts(function (data) {
+        post.getAll(function (data) {
             renderPosts(data);
-            dom.btnDelete = document.querySelectorAll('.btn-delete');
             attachEvents();
         });
     }
 
     function attachEvents() {
-        dom.form.addEventListener('submit', Events.handleSubmit);
-        [].forEach.call(dom.btnDelete, function (btn) {
-            //btn.addEventListener('click', Events.handleDelete);
-        });
+        $on(dom.form, 'submit', Events.handleSubmit);
+        delegate(dom.container, '.btn-delete', 'click', Events.handleDelete);
+        delegate(dom.container, '.btn-update', 'click', Events.handleUpdate);
     }
 
     function catchDOM() {
         Object.keys(st).forEach(function (key) {
-            dom[key] = document.querySelector(st[key]);
+            dom[key] = qs(st[key]);
         });
     }
 
@@ -113,20 +113,5 @@
         });
     }
 
-    function getPosts(cb) {
-        var xhr;
-
-        xhr = new XMLHttpRequest();
-
-        xhr.open('GET', '/posts');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === 200) {
-                cb(JSON.parse(xhr.responseText));
-            }
-        };
-
-        xhr.send();
-    }
-
-    document.addEventListener('DOMContentLoaded', ready);
+    window.$on(document, 'DOMContentLoaded', ready);
 })();

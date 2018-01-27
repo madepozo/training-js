@@ -12,21 +12,22 @@
         <div class="posts">
         </div>
         <form class="form form-create">
-          <h2>Create Post</h2>
-          <div class="form-control">
-            <label for="">ID</label>
-            <input type="text" name="id" />
-          </div>
+            <h2 class="form-title-create">Create Post</h2>
+            <h2 class="form-title-update">Update Post</h2>
+            <div class="form-control">
+                <input type="hidden" name="_id" />
+            </div>
           <div class="form-control">
             <label for="">Title</label>
             <input type="text" name="title" />
           </div>
           <div class="form-control">
             <label for="">Description</label>
-            <input type="text" name="description" />
+            <textarea name="description" ></textarea>
           </div>
           <div class="form-control">
-            <button class="btmSave" type="submit">Create</button>
+            <button class="btmSave btnSave-create" type="submit">Create</button>
+            <button class="btmSave btnSave-update" type="submit">Update</button>
           </div>
         </form>
     </div>
@@ -41,10 +42,12 @@
         <h4 class="post-title" data-id="{{ _id }}">{{ title }}</h4>
         <img class="post-image" src="/images/logo.png" alt="{{ title }}" />
         <p class="post-description">{{ description }}</p>
+        <a class="btn-update" data-id="{{ _id }}">Update</a>
         <a class="btn-delete" data-id="{{ _id }}">Delete</a>
     </script>
     <script src="/js/underscore.js"></script>
     <script src="/js/helpers.js"></script>
+    <script src="/js/post.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>
