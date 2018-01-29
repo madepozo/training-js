@@ -1,80 +1,30 @@
 var post = (function (){
     'use strict';
 
-    var xhr;
-    var SUCCESS = 200;
-
-    xhr = new XMLHttpRequest();
-
-    function get(postId, done) {
-        xhr.open('GET', '/posts/' + postId);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        xhr.send();
-    }
-
-    function getAll(done) {
-        xhr.open('GET', '/posts');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        xhr.send();
-    }
-
-    function save(data, done) {
-        var params;
-
-        xhr.open('POST', '/posts');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        params = Object.keys(data).map(function (key) {
-            return key + '=' + encodeURIComponent(data[key]);
-        }).join('&');
-        xhr.send(params);
-    }
-
-    function remove(_id, done) {
-        xhr.open('DELETE', '/posts/' + _id);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        xhr.send();
-    }
-
-    function update(postId, data, done) {
-        var params;
-
-        xhr.open('PUT', '/posts/' + postId);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        params = Object.keys(data).map(function (key) {
-            return key + '=' + encodeURIComponent(data[key]);
-        }).join('&');
-        xhr.send(params);
-    }
-
     return {
-        get: get,
-        getAll: getAll,
-        save: save,
-        remove: remove,
-        update: update
+        get: function (postId, done) {
+            $.get('/posts/' + postId, done);
+        },
+        getAll: function (done) {
+            $.get('/posts', done);
+        },
+        save: function (data, done) {
+            $.post('/posts', data, done);
+        },
+        remove: function (_id, done) {
+            $.ajax({
+                url: '/posts/' + _id,
+                method: 'delete',
+                success: done
+            });
+        },
+        update: function (postId, data, done) {
+            $.ajax({
+                method: 'put',
+                url: '/posts/' + postId,
+                data: data,
+                success: done
+            });
+        }
     };
 })();

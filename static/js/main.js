@@ -1,86 +1,71 @@
-(function() {
-    'use strict';
-
-    var st, dom, Events;
-
+$(function () {
+    var dom, st, Events;
     _.templateSettings = {
         evaluate: /\{\%(.+?)\%\}/g,
         interpolate: /\{\{(.+?)\}\}/g,
         escape: /<%-([\s\S]+?)%>/g
     };
-
+    
     st = {
         container: '.posts',
         templatePosts: '.tplPosts',
         templatePost: '.tplPost',
-        form: '.form-create',
+        form: '.form-create'
     };
 
     Events = {
         handleSubmit: function (event) {
             event.preventDefault();
-            var $form, $post, classOperation, _post;
+            var $form, $post, _id;
 
             $form = event.target;
             _post = {
                 title: $form.title.value,
                 description: $form.description.value
             };
+            _id = $form._id.value;
+            $form = $($form);
 
-            if ($form.classList.contains('form-create')) {
-                post.save(data, function (data) {
-                    $form.reset();
-                    $post = document.createElement('div');
-                    $post.className = 'post';
-                    $post.setAttribute('data-id', data._id);
-                    $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
-                    dom.container.appendChild($post);
-                });
+            if ($form.hasClass('form-create')) {
+                post.save(_post, function (data) {
+                    $post = $('<div>', {class: 'post'});
+                    $post.data('id', data._id);
+                    $post.html(_.template(dom.templatePost.html())(data));
+                    dom.container.append($post);
+                    $form.get(0).reset();
+                });                
             } else {
-                post.update($form._id.value, _post, function (data) {
+                post.update(_id, _post, function (data) {
                     var $post;
 
-                    $post = qs('.post[data-id="' + data._id + '"]');
-                    $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
-                    $form.classList.remove('form-update');
-                    $form.classList.add('form-create');
-                    $form.reset();
+                    $post = $('.post[data-id="' + data._id + '"]');
+                    $post.html(_.template(dom.templatePost.html())(data));
+                    $form.removeClass('form-update').addClass('form-create');
+                    $form.get(0).reset();
                 });
             }
+        },
+        handleUpdate: function (event) {
+            var $el;
+
+            $el = $(event.target).addClass('disabled');
+            post.get($el.data('id'), function (data) {
+                dom.form
+                    .removeClass('form-create')
+                    .addClass('form-update');
+                setFormToUpdate(data);
+            });
         },
         handleDelete: function (event) {
             var $el, _id;
 
-            $el = event.target;
-            _id = $el.getAttribute('data-id');
+            $el = $(event.target);
+            _id = $el.data('id');
             post.remove(_id, function (data) {
-                var $postToDelete;
-
-                $postToDelete = qs('.post[data-id="' + _id + '"]');
-                $postToDelete.remove();
-            });
-        },
-        handleUpdate: function (event) {
-            var $el, postId;
-
-            $el = event.target;
-            postId = $el.getAttribute('data-id');
-            $el.classList.add('disabled');
-            post.get(postId, function (data) {
-                dom.form.classList.remove('form-create');
-                dom.form.classList.add('form-update');
-                setFormToUpdate(data);
+                $('.post[data-id="' + _id + '"]').remove();
             });
         }
     };
-
-    function setFormToUpdate(data) {
-        Object.keys(data).forEach(function (key) {
-            if (dom.form[key]) {
-                dom.form[key].value = data[key];
-            }
-        });
-    }
 
     function ready() {
         dom = {};
@@ -91,27 +76,39 @@
         });
     }
 
-    function attachEvents() {
-        $on(dom.form, 'submit', Events.handleSubmit);
-        delegate(dom.container, '.btn-delete', 'click', Events.handleDelete);
-        delegate(dom.container, '.btn-update', 'click', Events.handleUpdate);
-    }
-
     function catchDOM() {
         Object.keys(st).forEach(function (key) {
-            dom[key] = qs(st[key]);
+            dom[key] = $(st[key]);
         });
+    }
+
+    function attachEvents() {
+        dom.form.on('submit', Events.handleSubmit);
+        dom.container.delegate('.btn-update', 'click', Events.handleUpdate);
+        dom.container.delegate('.btn-delete', 'click', Events.handleDelete);
     }
 
     function renderPosts(posts) {
-        var templatePosts;
+        var templatePosts, data;
 
-        templatePosts = _.template(dom.templatePosts.innerHTML);
-        dom.container.innerHTML = templatePosts({
-          posts: posts,
-          template: dom.templatePost.innerHTML
+        data = {
+            posts: posts,
+            template: dom.templatePost.html()
+        };
+        templatePosts = _.template(dom.templatePosts.html());
+        dom.container.html(templatePosts(data));
+    }
+
+    function setFormToUpdate(data) {
+        var $form;
+
+        $form = dom.form.get(0);        
+        Object.keys(data).forEach(function (key) {
+            if ($form[key]) {
+                $form[key].value = data[key];
+            }
         });
     }
 
-    window.$on(document, 'DOMContentLoaded', ready);
-})();
+    ready();
+});
