@@ -28,7 +28,7 @@
             };
 
             if ($form.classList.contains('form-create')) {
-                post.save(data, function (data) {
+                post.save(_post, function (data) {
                     $form.reset();
                     $post = document.createElement('div');
                     $post.className = 'post';
