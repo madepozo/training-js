@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    var st, dom, Events;
+    let st, dom, Events, post;
 
     _.templateSettings = {
         evaluate: /\{\%(.+?)\%\}/g,
@@ -17,9 +17,9 @@
     };
 
     Events = {
-        handleSubmit: function (event) {
+        handleSubmit: (event) => {
             event.preventDefault();
-            var $form, $post, classOperation, _post;
+            let $form, $post, classOperation, _post;
 
             $form = event.target;
             _post = {
@@ -28,7 +28,7 @@
             };
 
             if ($form.classList.contains('form-create')) {
-                post.save(_post, function (data) {
+                post.save(_post, data => {
                     $form.reset();
                     $post = document.createElement('div');
                     $post.className = 'post';
@@ -38,7 +38,7 @@
                 });
             } else {
                 post.update($form._id.value, _post, function (data) {
-                    var $post;
+                    let $post;
 
                     $post = qs('.post[data-id="' + data._id + '"]');
                     $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
@@ -48,25 +48,23 @@
                 });
             }
         },
-        handleDelete: function (event) {
-            var $el, _id;
+        handleDelete: ({ target: $el }) => {
+            let _id;
 
-            $el = event.target;
             _id = $el.getAttribute('data-id');
             post.remove(_id, function (data) {
-                var $postToDelete;
+                let $postToDelete;
 
-                $postToDelete = qs('.post[data-id="' + _id + '"]');
+                $postToDelete = qs(`.post[data-id="${_id}"`);
                 $postToDelete.remove();
             });
         },
-        handleUpdate: function (event) {
-            var $el, postId;
+        handleUpdate: ({ target: $el }) => {
+            let postId;
 
-            $el = event.target;
             postId = $el.getAttribute('data-id');
             $el.classList.add('disabled');
-            post.get(postId, function (data) {
+            post.get(postId, data => {
                 dom.form.classList.remove('form-create');
                 dom.form.classList.add('form-update');
                 setFormToUpdate(data);
@@ -84,8 +82,9 @@
 
     function ready() {
         dom = {};
+        post = new Post();
         catchDOM();
-        post.getAll(function (data) {
+        post.getAll(data => {
             renderPosts(data);
             attachEvents();
         });
@@ -98,19 +97,15 @@
     }
 
     function catchDOM() {
-        Object.keys(st).forEach(function (key) {
-            dom[key] = qs(st[key]);
-        });
+        Object.keys(st).forEach(k => dom[k] = qs(st[k]));
     }
 
     function renderPosts(posts) {
-        var templatePosts;
+        let templatePosts, template;
 
         templatePosts = _.template(dom.templatePosts.innerHTML);
-        dom.container.innerHTML = templatePosts({
-          posts: posts,
-          template: dom.templatePost.innerHTML
-        });
+        template = dom.templatePost.innerHTML;
+        dom.container.innerHTML = templatePosts({ posts, template });
     }
 
     window.$on(document, 'DOMContentLoaded', ready);

@@ -1,14 +1,24 @@
-var post = (function (){
-    'use strict';
+const SUCCESS = 200;
+const xhr = new XMLHttpRequest();
 
-    var xhr;
-    var SUCCESS = 200;
+class Post {
+    constructor() {
+        this.BASE_URL = '/posts'
+    }
 
-    xhr = new XMLHttpRequest();
-
-    function get(postId, done) {
-        xhr.open('GET', '/posts/' + postId);
-        xhr.onreadystatechange = function () {
+    get(postId, done) {
+        xhr.open('GET', `${this.BASE_URL}/${postId}`);
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
+                done(JSON.parse(xhr.responseText));
+            }
+        };
+        xhr.send();
+    }
+    
+    getAll(done) {
+        xhr.open('GET', this.BASE_URL);
+        xhr.onreadystatechange = () => {
             if (xhr.readyState > 3 && xhr.status === SUCCESS) {
                 done(JSON.parse(xhr.responseText));
             }
@@ -16,36 +26,26 @@ var post = (function (){
         xhr.send();
     }
 
-    function getAll(done) {
-        xhr.open('GET', '/posts');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status === SUCCESS) {
-                done(JSON.parse(xhr.responseText));
-            }
-        };
-        xhr.send();
-    }
+    save(data, done) {
+        let params = Object.keys(data)
+            .map(k => `${k}=${encodeURIComponent(data[k])}`)
+            .join('&');
 
-    function save(data, done) {
-        var params;
-
-        xhr.open('POST', '/posts');
+        xhr.open('POST', this.BASE_URL);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
+        xhr.onreadystatechange = () => {
             if (xhr.readyState > 3 && xhr.status === SUCCESS) {
                 done(JSON.parse(xhr.responseText));
             }
         };
-        params = Object.keys(data).map(function (key) {
-            return key + '=' + encodeURIComponent(data[key]);
-        }).join('&');
+
         xhr.send(params);
     }
 
-    function remove(_id, done) {
-        xhr.open('DELETE', '/posts/' + _id);
-        xhr.onreadystatechange = function () {
+    remove(postId, done) {
+        xhr.open('DELETE', `${this.BASE_URL}/${postId}`);
+        xhr.onreadystatechange = () => {
             if (xhr.readyState > 3 && xhr.status === SUCCESS) {
                 done(JSON.parse(xhr.responseText));
             }
@@ -53,28 +53,20 @@ var post = (function (){
         xhr.send();
     }
 
-    function update(postId, data, done) {
-        var params;
+    update(postId, data, done) {
+        let params = Object.keys(data)
+            .map(k => `${k}=${encodeURIComponent(data[k])}`)
+            .join('&');
 
-        xhr.open('PUT', '/posts/' + postId);
+        xhr.open('PUT', `${this.BASE_URL}/${postId}`);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
+        xhr.onreadystatechange = () => {
             if (xhr.readyState > 3 && xhr.status === SUCCESS) {
                 done(JSON.parse(xhr.responseText));
             }
         };
-        params = Object.keys(data).map(function (key) {
-            return key + '=' + encodeURIComponent(data[key]);
-        }).join('&');
+
         xhr.send(params);
     }
-
-    return {
-        get: get,
-        getAll: getAll,
-        save: save,
-        remove: remove,
-        update: update
-    };
-})();
+}
