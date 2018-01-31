@@ -4,14 +4,31 @@ body {
   font-size: 16px;
   font-family: Helvetica, Arial, sans-serif;
 }
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.wrapper .posts,
+.wrapper .form {
+
+}
+
+.hide {
+  display: none!important;
+}
+
 .posts {
-    box-sizing: border-box;
-    width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100px;
-    text-align: center;
-  }
+  box-sizing: border-box;
+  width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100px;
+  text-align: center;
+  transition: all .3s linear;
+}
 
 span.item {
   border-radius: 4px;
@@ -113,11 +130,6 @@ button {
   display: inline-block;
   border: none;
 
-}
-
-.posts, .form {
-  display: inline-block;
-  vertical-align: top;
 }
 
 .post {

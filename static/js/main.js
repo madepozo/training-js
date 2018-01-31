@@ -36,6 +36,7 @@
                     $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
                     dom.container.appendChild($post);
                 });
+                dom.container.classList.remove('hide');
             } else {
                 post.update($form._id.value, _post, function (data) {
                     var $post;
@@ -58,6 +59,10 @@
 
                 $postToDelete = qs('.post[data-id="' + _id + '"]');
                 $postToDelete.remove();
+
+                if (!dom.container.children.length) {
+                    dom.container.classList.add('hide');
+                }
             });
         },
         handleUpdate: function (event) {
@@ -86,7 +91,10 @@
         dom = {};
         catchDOM();
         post.getAll(function (data) {
-            renderPosts(data);
+            if (data.length) {
+                renderPosts(data);
+            }
+
             attachEvents();
         });
     }
@@ -111,6 +119,7 @@
           posts: posts,
           template: dom.templatePost.innerHTML
         });
+        dom.container.classList.remove('hide');
     }
 
     window.$on(document, 'DOMContentLoaded', ready);
