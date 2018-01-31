@@ -11,9 +11,20 @@ body {
   justify-content: center;
 }
 
-.wrapper .posts,
-.wrapper .form {
+.container-action {
+  text-align: center;
+  margin: 15px 0;
+}
 
+.redirect-create {
+  display: inline-block;
+  background: #009fc6;
+  border: 1px solid #009fc6;
+  color: #FFF;
+  cursor: pointer;
+  line-height: 20px;
+  padding: 8px 10px;
+  border-radius: 4px;
 }
 
 .hide {
@@ -53,7 +64,6 @@ body {
 .posts {
   box-sizing: border-box;
   width: 60%;
-  margin: 0 auto;
   padding: 0 10px 30px 10px;
 }
 

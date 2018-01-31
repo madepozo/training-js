@@ -14,6 +14,7 @@
         templatePosts: '.tplPosts',
         templatePost: '.tplPost',
         form: '.form-create',
+        redirectToCreate: '.redirect-create'
     };
 
     Events = {
@@ -36,7 +37,6 @@
                     $post.innerHTML = _.template(dom.templatePost.innerHTML)(data);
                     dom.container.appendChild($post);
                 });
-                dom.container.classList.remove('hide');
             } else {
                 post.update($form._id.value, _post, function (data) {
                     var $post;
@@ -48,6 +48,8 @@
                     $form.reset();
                 });
             }
+            dom.form.classList.add('hide');
+            Router.navigate();
         },
         handleDelete: function (event) {
             var $el, _id;
@@ -59,10 +61,6 @@
 
                 $postToDelete = qs('.post[data-id="' + _id + '"]');
                 $postToDelete.remove();
-
-                if (!dom.container.children.length) {
-                    dom.container.classList.add('hide');
-                }
             });
         },
         handleUpdate: function (event) {
@@ -70,12 +68,10 @@
 
             $el = event.target;
             postId = $el.getAttribute('data-id');
-            $el.classList.add('disabled');
-            post.get(postId, function (data) {
-                dom.form.classList.remove('form-create');
-                dom.form.classList.add('form-update');
-                setFormToUpdate(data);
-            });
+            Router.navigate('/posts/' + postId + '/edit');
+        },
+        handleRedirect: function (event) {
+            Router.navigate('/create');
         }
     };
 
@@ -90,17 +86,12 @@
     function ready() {
         dom = {};
         catchDOM();
-        post.getAll(function (data) {
-            if (data.length) {
-                renderPosts(data);
-            }
-
-            attachEvents();
-        });
+        setRouter();
     }
 
     function attachEvents() {
         $on(dom.form, 'submit', Events.handleSubmit);
+        $on(dom.redirectToCreate, 'click', Events.handleRedirect);
         delegate(dom.container, '.btn-delete', 'click', Events.handleDelete);
         delegate(dom.container, '.btn-update', 'click', Events.handleUpdate);
     }
@@ -120,6 +111,37 @@
           template: dom.templatePost.innerHTML
         });
         dom.container.classList.remove('hide');
+    }
+
+    function setRouter() {
+        Router.config({ mode: 'history' });
+        Router
+            .add('/create', function () {
+                attachEvents();
+                dom.redirectToCreate.classList.add('hide');
+                dom.container.classList.add('hide');
+                dom.form.classList.remove('hide');
+            })
+            .add('/posts\/(.*)\/edit', function (postId) {
+                attachEvents();
+                dom.redirectToCreate.classList.add('hide');
+                dom.container.classList.add('hide');
+                post.get(postId, function (data) {
+                    dom.form.classList.remove('hide');
+                    dom.form.classList.remove('form-create');
+                    dom.form.classList.add('form-update');
+                    setFormToUpdate(data);
+                });
+            })
+            .add(function () {
+                dom.redirectToCreate.classList.remove('hide');
+                dom.form.classList.add('hide');
+                post.getAll(function (data) {
+                    attachEvents();
+                    renderPosts(data);
+                });
+            })
+            .listen();
     }
 
     window.$on(document, 'DOMContentLoaded', ready);

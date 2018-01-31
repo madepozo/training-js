@@ -8,10 +8,13 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+    <div class="container-action">
+        <a class="redirect-create">Create post</a>
+    </div>
     <div class="wrapper">
         <div class="posts hide">
         </div>
-        <form class="form form-create">
+        <form class="form form-create hide">
             <h2 class="form-title-create">Create Post</h2>
             <h2 class="form-title-update">Update Post</h2>
             <div class="form-control">
@@ -46,6 +49,7 @@
         <a class="btn-delete" data-id="{{ _id }}">Delete</a>
     </script>
     <script src="/js/underscore.js"></script>
+    <script src="/js/router.js"></script>
     <script src="/js/helpers.js"></script>
     <script src="/js/post.js"></script>
     <script src="/js/main.js"></script>
