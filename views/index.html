@@ -1,57 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <div class="container-action">
-        <a class="redirect-create">Create post</a>
-    </div>
-    <div class="wrapper">
-        <div class="posts hide">
-        </div>
-        <form class="form form-create hide">
-            <h2 class="form-title-create">Create Post</h2>
-            <h2 class="form-title-update">Update Post</h2>
-            <div class="form-control">
-                <input type="hidden" name="_id" />
-            </div>
-          <div class="form-control">
-            <label for="">Title</label>
-            <input type="text" name="title" />
-          </div>
-          <div class="form-control">
-            <label for="">Description</label>
-            <textarea name="description" ></textarea>
-          </div>
-          <div class="form-control">
-            <button class="btmSave btnSave-create" type="submit">Create</button>
-            <button class="btmSave btnSave-update" type="submit">Update</button>
-          </div>
-        </form>
-    </div>
-    <script type="text/template" class="tplPosts">
-        {% posts.forEach(function(post) { %}
-            <div class="post" data-id="{{ post._id }}">
-                {{ _.template(template)(post) }}
-            </div>
-        {% }); %}
-    </script>
-    <script type="text/template" class="tplPost">
-        <h4 class="post-title" data-id="{{ _id }}">{{ title }}</h4>
-        <img class="post-image" src="/images/logo.png" alt="{{ title }}" />
-        <p class="post-description">{{ description }}</p>
-        <a class="btn-update" data-id="{{ _id }}">Update</a>
-        <a class="btn-delete" data-id="{{ _id }}">Delete</a>
-    </script>
-    <script src="/js/underscore.js"></script>
-    <script src="/js/router.js"></script>
-    <script src="/js/helpers.js"></script>
-    <script src="/js/post.js"></script>
-    <script src="/js/main.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+        <link rel="stylesheet" href="/css/styles.css" />
+    </head>
+    <body>
+        <div id="app"></div>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="/js/post.js"></script>
+        <script type="text/babel">
+
+            class App extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        posts: [],
+                        title: '',
+                        _id: '',
+                        description: '',
+                        status: 'create'
+                    };
+                    this.handleUpdate = this.handleUpdate.bind(this);
+                    this.handleDelete = this.handleDelete.bind(this);
+                    this.handleSubmit = this.handleSubmit.bind(this);
+                }
+                handleSubmit(model) {
+                    if (this.state.status === 'create') {
+                        delete model._id;
+                        post.save(model, json => {
+                            this.setState(prevState => ({
+                                posts: prevState.posts.concat(json)
+                            }));
+                        });
+                    } else {
+                        post.update(model._id, model, json => {
+                            let _posts = this.state.posts;
+
+                            _posts.forEach(item => {
+                                if (item._id === model._id) {
+                                    item.title = model.title
+                                    item.description = model.description
+                                }
+                            });
+                            this.setState({ posts: _posts });
+                        });
+                    }
+
+                    this.setState({
+                        title: '',
+                        _id: '',
+                        description: '',
+                        status: 'create'
+                    });
+                }
+
+                handleDelete(id) {
+                    post.remove(id, (json) => {
+                        this.setState(prevState => ({
+                            posts: prevState.posts.filter(item => item._id !== id )
+                        }))
+                    });
+                }
+                
+                handleUpdate(id) {
+                    post.get(id, json => {
+                        this.setState({
+                            _id: json._id,
+                            title: json.title,
+                            description: json.description,
+                            status: 'update'
+                        });
+                    });
+                }
+
+                componentWillMount() {
+                    post.getAll(json => {
+                        this.setState(prevState => ({
+                            posts: prevState.posts.concat(json)
+                        }));
+                    });
+                }
+
+                render() {
+                    return (
+                        <div className="wrapper">
+                            <Posts
+                                posts={this.state.posts}
+                                parentHandleDelete={this.handleDelete}
+                                parentHandleUpdate={this.handleUpdate}
+                            />
+                            <Form
+                                handleSubmit={this.handleSubmit}
+                                postId={this.state._id}
+                                postTitle={this.state.title}
+                                postDescription={this.state.description}
+                                statusForm={this.state.status}
+                            />
+                        </div>
+                    )
+                }
+            }
+
+            class Form extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {
+                        _id: '',
+                        title: '',
+                        description: ''
+                    };
+                    this.handleSubmit = this.handleSubmit.bind(this);
+                    this.handleChangeId = this.handleChangeId.bind(this);
+                    this.handleChangeTitle = this.handleChangeTitle.bind(this);
+                    this.handleChangeDescription = this.handleChangeDescription.bind(this);
+                }
+
+                handleSubmit(e) {
+                    e.preventDefault();
+                    this.props.handleSubmit({
+                        _id: this.state._id,
+                        title: this.state.title,
+                        description: this.state.description
+                    });
+                    this.setState({
+                        _id: '',
+                        title: '',
+                        description: ''
+                    });
+                }
+
+                handleChangeId(e) {
+                    this.setState({
+                        _id: e.target.value
+                    });
+                }
+
+                handleChangeTitle(e) {
+                    this.setState({
+                        title: e.target.value
+                    });
+                }
+
+                handleChangeDescription(e) {
+                    this.setState({
+                        description: e.target.value
+                    });
+                }
+
+                componentWillReceiveProps(nextProps) {
+                    this.setState({
+                        _id: nextProps.postId,
+                        title: nextProps.postTitle,
+                        description: nextProps.postDescription
+                    });
+                }
+
+                render() {
+                    let className = 'form';
+
+                    if (this.props.statusForm === 'create') {
+                        className += ' form-create';
+                    } else {
+                        className += ' form-update';
+                    }
+
+                    return (
+                        <form className={className} onSubmit={this.handleSubmit}>
+                            <h2 className="form-title-create">Create Post</h2>
+                                <h2 className="form-title-update">Update Post</h2>
+                                <div className="form-control">
+                                    <input type="hidden" name="_id" value={this.state._id} onChange={this.handleChangeId}/>
+                                </div>
+                            <div className="form-control">
+                                <label htmlFor="">Title</label>
+                                <input type="text" name="title" value={this.state.title} onChange={this.handleChangeTitle} />
+                            </div>
+                            <div className="form-control">
+                                <label htmlFor="">Description</label>
+                                <textarea name="description" value={this.state.description} onChange={this.handleChangeDescription}></textarea>
+                            </div>
+                            <div className="form-control">
+                                <button className="btmSave btnSave-create" type="submit">Create</button>
+                                <button className="btmSave btnSave-update" type="submit">Update</button>
+                            </div>
+                        </form>
+                    );
+                }
+            }
+
+            class Posts extends React.Component {
+                constructor(props) {
+                    super(props);
+                }
+
+                handleDelete(id) {
+                    this.props.parentHandleDelete(id);
+                }
+
+                handleUpdate(id) {
+                    this.props.parentHandleUpdate(id);
+                }
+
+                render() {
+                    let className = '';
+
+                    if (this.props.posts.length) {
+                        className = 'posts';
+                    } else {
+                        className = 'posts hide';
+                    }
+
+                    return (
+                        <div className={className} >
+                            {this.props.posts.map(post => (
+                                <div className="post" key={post._id}>
+                                    <h4 className="post-title" data-id={post._id}>{ post.title }</h4>
+                                    <img className="post-image" src="/images/logo.png" alt={post.title} />
+                                    <p className="post-description">{post.description }</p>
+                                    <a className="btn-update" onClick={this.handleUpdate.bind(this, post._id)}>Update</a>
+                                    <a className="btn-delete" onClick={this.handleDelete.bind(this, post._id)}>Delete</a>
+                                </div>
+                            ))}
+                        </div>
+                    );
+                }
+            }
+
+            ReactDOM.render(<App />, document.querySelector('#app'));
+        </script>
+    </body>
 </html>
